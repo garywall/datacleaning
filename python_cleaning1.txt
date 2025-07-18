@@ -1,0 +1,32 @@
+Data Cleaning
+
+.info() column type info
+.describe() column value info (mean/std/min/max)
+
+# string to int
+dict['column'] = dict['column'].str.strip('$')
+dict['column'] = dict['column'].astype('int')
+assert dict['column'].dtype == 'int'
+
+# numeric to category
+dict['column'] = dict['column'].astype('category')
+
+# uniqness / duplicate rows. 
+# keep: first (keep first row), last, False (keep all)
+duplicates = dict.duplicated(subset=['columnA', 'columnB'], keep=False)
+dict[duplicates]
+dict[duplicates].sort_values(by='columnA')
+dict[duplicates].drop_duplicates(subset=['columnA', 'columnB'], keep=False, inplace=True)
+
+# treat duplicate where one numeric column is different
+dict = dict.groupby(by=['columnA', 'columnB']).agg({ 'numericColA': 'max', 'numericColB': 'mean }).reset_index()
+
+# find inconsistent categories
+inconsistent_cats = set(dict['columnA']).difference(known_good_cats['columnA'])
+inconsistent_rows = dict['columnA'].isin(inconsistent_cats)
+dict[inconsistent_rows]
+# drop inconsistent rows
+consistent = dict[~inconsistent_rows]
+
+# missing data
+dict.isna().sum()
